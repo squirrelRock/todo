@@ -1,16 +1,38 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-// replace this firebase conFigvariable with your own
-const firebaseConfig = {
-apiKey: "AIzaSyClH1YdssQHAA0peMtQ_wj2A4Crnc4fEgU",
-authDomain: "medium-firebase-next-todo.firebaseapp.com",
-projectId: "medium-firebase-next-todo",
-storageBucket: "medium-firebase-next-todo.appspot.com",
-messagingSenderId: "989711683222",
-appId: "1:989711683222:web:bc878dca5a5d251177fcb7",
+import { db } from "../firebase";
+import {
+collection,
+addDoc,
+updateDoc,
+doc,
+deleteDoc,
+} from "firebase/firestore";
+const addTodo = async ({ userId, title, description, status }) => {
+try {
+await addDoc(collection(db, "todo"), {
+user: userId,
+title: title,
+description: description,
+status: status,
+createdAt: new Date().getTime(),
+});
+} catch (err) {}
 };
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-export { auth, db };
+const toggleTodoStatus = async ({ docId, status }) => {
+try {
+const todoRef = doc(db, "todo", docId);
+await updateDoc(todoRef, {
+status,
+});
+} catch (err) {
+console.log(err);
+}
+};
+const deleteTodo = async (docId) => {
+try {
+const todoRef = doc(db, "todo", docId);
+await deleteDoc(todoRef);
+} catch (err) {
+console.log(err);
+}
+};
+export { addTodo, toggleTodoStatus, deleteTodo };
